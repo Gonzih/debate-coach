@@ -1,0 +1,104 @@
+# debate-coach MCP Server
+
+## Purpose
+An MCP server that trains critical thinking through structured debate. Forces students to argue both sides of any topic, detects logical fallacies in real time, scores argument quality, and synthesizes the debate.
+
+## Core Philosophy
+Based on the Socratic method and professional debate formats (Lincoln-Douglas, Oxford, Karl Popper). The goal is not to win arguments but to develop the capacity for rigorous, evidence-based reasoning — including the ability to argue positions you personally disagree with.
+
+## MCP Tools Available
+
+### start_debate
+Starts a debate session. Refines the student's topic into a proper debate proposition. Returns sessionId and instructions.
+- Input: profileId (string), topic (optional string), position (optional string)
+- Output: Proposition, sessionId, step-by-step instructions
+
+### submit_argument
+Scores a single argument on 4 dimensions (0-10 total) and detects logical fallacies.
+- Input: sessionId, argument (string)
+- Output: Scores (evidence 0-3, logic 0-3, relevance 0-2, originality 0-2), fallacies detected, feedback, strengthening suggestion
+
+### get_steelman
+Generates the strongest possible opposing argument after the student has argued their side (3+ arguments minimum).
+- Input: sessionId
+- Output: Steel-man paragraph + 5 key counter-arguments
+
+### flip_sides
+Switches the student to argue the opposing position. Requires get_steelman to be called first.
+- Input: sessionId
+- Output: New position prompt and instructions
+
+### complete_debate
+Finalizes the debate, generates synthesis, saves to progress database.
+- Input: sessionId
+- Output: Performance scores, synthesis paragraph, saved to ~/.debate-coach/debates.db
+
+### build_argument
+Socratic scaffolding for students who don't know where to start. Takes a rough thought and returns guiding questions.
+- Input: sessionId, thought (rough idea)
+- Output: 4 Socratic questions + one-sentence hint
+
+### get_topic_list
+Returns curated debate topics, filterable by category, age group, difficulty.
+- Input: category? (social/science/policy/philosophy/technology/historical/economics/health), ageGroup? (teens/general), difficulty? (easy/medium/hard)
+- Output: 50+ topics with propositions, tags, difficulty ratings
+
+### get_progress
+Returns progress report for a student profile.
+- Input: profileId
+- Output: Debates completed, average scores (PRO and CON), fallacy trend over time, top fallacies, improvement areas, score history
+
+### get_fallacy_guide
+Reference guide for the 20 logical fallacies the system detects.
+- Input: fallacyType? (specific fallacy key)
+- Output: Full guide or detail on specific fallacy
+
+## Logical Fallacies Detected (20)
+ad_hominem, straw_man, false_dichotomy, slippery_slope, hasty_generalization, appeal_to_authority, appeal_to_emotion, circular_reasoning, red_herring, bandwagon, false_equivalence, appeal_to_nature, anecdotal_evidence, post_hoc, tu_quoque, loaded_question, appeal_to_tradition, no_true_scotsman, moving_goalposts, cherry_picking
+
+## Argument Scoring Criteria
+- Evidence (0-3): Factual backing, studies, data, expert consensus
+- Logic (0-3): Sound reasoning, no fallacies, valid conclusions
+- Relevance (0-2): Directly supports the proposition
+- Originality (0-2): Nuanced insight vs. generic point
+- Total: 0-10
+
+## Debate Session Flow
+1. start_debate → get sessionId and proposition
+2. submit_argument × 3-5 (argue FOR)
+3. get_steelman → see opposing case
+4. flip_sides → switch positions
+5. submit_argument × 3-5 (argue AGAINST)
+6. complete_debate → synthesis + save to DB
+
+## Data Storage
+- In-memory: Active debate sessions
+- SQLite at ~/.debate-coach/debates.db: Completed debates, progress history
+- No external data transmission (API calls to Anthropic only)
+
+## Model Used
+claude-opus-4-6 with adaptive thinking for all scoring, fallacy detection, steel-manning, and synthesis generation.
+
+## Setup
+```bash
+# Install
+npm install -g @gonzih/debate-coach
+
+# Configure ANTHROPIC_API_KEY
+export ANTHROPIC_API_KEY=your-key-here
+
+# Run as MCP server
+debate-coach
+```
+
+## MCP Config (Claude Desktop)
+```json
+{
+  "mcpServers": {
+    "debate-coach": {
+      "command": "npx",
+      "args": ["@gonzih/debate-coach"]
+    }
+  }
+}
+```

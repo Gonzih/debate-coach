@@ -1,0 +1,50 @@
+{
+  "name": "@gonzih/debate-coach",
+  "version": "0.1.0",
+  "description": "MCP server that trains critical thinking by making students argue both sides of any topic, catching logical fallacies in real time, and scoring argument quality",
+  "author": "Gonzih",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "debate-coach": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md",
+    "llms.txt"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "better-sqlite3": "^11.9.1",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "mcp",
+    "debate",
+    "critical-thinking",
+    "education",
+    "logical-fallacies",
+    "argumentation",
+    "socratic-method",
+    "claude"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gonzih/debate-coach"
+  }
+}
